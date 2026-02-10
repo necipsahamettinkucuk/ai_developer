@@ -1,0 +1,99 @@
+name: Issue -> AI PR -> Auto-merge
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  ai_from_issue:
+    # Sadece ai-task label'? varsa ?al??s?n (issue template otomatik ekliyor)
+    if: contains(github.event.issue.labels.*.name, 'ai-task')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install deps
+        working-directory: web
+        run: npm ci
+
+      - name: Run Codex to implement task
+        uses: openai/codex-action@v1
+        with:
+          openai_api_key: ${{ secrets.OPENAI_API_KEY }}
+          prompt: |
+            You are working in a Next.js app under /web.
+            HARD RULES:
+            - Only modify files under /web (do not change .github/workflows or repo settings).
+            - Do not add or print secrets.
+            - Keep changes minimal and consistent with existing code style.
+            - Ensure: npm run lint && npm run build succeed.
+
+            Task (from GitHub Issue):
+            Title: ${{ github.event.issue.title }}
+            Body:
+            ${{ github.event.issue.body }}
+
+      - name: Lint
+        working-directory: web
+        run: npm run lint
+
+      - name: Build
+        working-directory: web
+        run: npm run build
+
+      - name: Create Pull Request
+        id: cpr
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: ai/issue-${{ github.event.issue.number }}
+          title: "AI: ${{ github.event.issue.title }}"
+          commit-message: "AI: implement issue #${{ github.event.issue.number }}"
+          body: |
+            Closes #${{ github.event.issue.number }}
+
+            ## Issue
+            ${{ github.event.issue.title }}
+
+            ## Notes
+            - Changes limited to /web
+            - Lint+Build ran in workflow
+          labels: |
+            ai-pr
+
+      - name: Comment issue with PR link
+        if: steps.cpr.outputs.pull-request-url != ''
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue_number = context.payload.issue.number;
+            const prUrl = `${{ steps.cpr.outputs.pull-request-url }}`;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number,
+              body: `? PR created: ${prUrl}
+
+CI ge?ince **auto-merge** ile main'e al?nacak ve Vercel prod deploy edecektir.`
+            });
+
+      - name: Enable auto-merge on the PR
+        if: steps.cpr.outputs.pull-request-number != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER="${{ steps.cpr.outputs.pull-request-number }}"
+          gh pr merge "$PR_NUMBER" --auto --squash --delete-branch
