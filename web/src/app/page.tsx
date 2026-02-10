@@ -20,7 +20,7 @@ const highlights = [
 export default function Home() {
   return (
     <main>
-      <section className="relative overflow-hidden bg-gradient-to-br from-red-700 via-red-600 to-rose-500 text-white">
+      <section className="relative overflow-hidden bg-gradient-to-br from-emerald-800 via-emerald-700 to-lime-500 text-white">
         <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-white/10 blur-3xl" />
         <div className="absolute bottom-0 left-0 h-56 w-56 -translate-x-24 translate-y-16 rounded-full bg-white/10 blur-3xl" />
         <div className="mx-auto max-w-6xl px-6 py-16">
@@ -37,7 +37,7 @@ export default function Home() {
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
                 href="/otobus"
-                className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-red-700 shadow-lg shadow-red-900/30 transition hover:-translate-y-0.5"
+                className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-emerald-700 shadow-lg shadow-emerald-900/30 transition hover:-translate-y-0.5"
               >
                 {"Otobüs Bileti"}
               </Link>
@@ -99,13 +99,13 @@ export default function Home() {
               <div className="mt-6 flex flex-wrap gap-3">
                 <Link
                   href="/otobus"
-                  className="rounded-full bg-red-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700"
+                  className="rounded-full bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700"
                 >
                   {"Otobüs seferi ara"}
                 </Link>
                 <Link
                   href="/ucak"
-                  className="rounded-full bg-rose-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-rose-600"
+                  className="rounded-full bg-lime-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-lime-600"
                 >
                   {"Uçak bileti ara"}
                 </Link>
@@ -119,15 +119,15 @@ export default function Home() {
               </p>
               <div className="mt-4 grid gap-3 text-sm text-slate-600">
                 <div className="flex items-start gap-3 rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3">
-                  <span className="mt-2 h-2 w-2 rounded-full bg-red-500" />
+                  <span className="mt-2 h-2 w-2 rounded-full bg-emerald-500" />
                   <span>{"7/24 destek ve hızlı iade süreçleri"}</span>
                 </div>
                 <div className="flex items-start gap-3 rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3">
-                  <span className="mt-2 h-2 w-2 rounded-full bg-rose-500" />
+                  <span className="mt-2 h-2 w-2 rounded-full bg-lime-500" />
                   <span>{"Tek panelde otobüs ve uçak yönetimi"}</span>
                 </div>
                 <div className="flex items-start gap-3 rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3">
-                  <span className="mt-2 h-2 w-2 rounded-full bg-red-400" />
+                  <span className="mt-2 h-2 w-2 rounded-full bg-emerald-400" />
                   <span>Esnek tarih ve kampanya bildirimleri</span>
                 </div>
               </div>

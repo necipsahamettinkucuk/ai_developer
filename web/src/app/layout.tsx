@@ -1,12 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
-
-const plusJakarta = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  variable: "--font-plus-jakarta",
-});
 
 export const metadata: Metadata = {
   title: "Hasobilet",
@@ -21,7 +15,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="tr">
-      <body className={`${plusJakarta.variable} font-sans`}>
+      <body className="font-sans">
         <div className="min-h-screen bg-[#f5f7fb] text-slate-900">
           <header className="sticky top-0 z-40 border-b border-white/70 bg-white/80 backdrop-blur">
             <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
