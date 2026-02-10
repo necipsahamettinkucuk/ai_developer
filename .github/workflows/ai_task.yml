@@ -1,0 +1,74 @@
+name: AI Task -> PR
+
+on:
+  workflow_dispatch:
+    inputs:
+      task:
+        description: "What should the AI change? (clear acceptance criteria preferred)"
+        required: true
+        type: string
+      branch:
+        description: "Branch name (optional)"
+        required: false
+        default: "ai/task"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  ai_task:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install deps
+        run: npm ci
+
+      # Codex runs and edits files in the repo based on the task
+      - name: Run Codex to implement task
+        uses: openai/codex-action@v1
+        with:
+          openai_api_key: ${{ secrets.OPENAI_API_KEY }}
+          # Give Codex clear constraints to reduce risk
+          prompt: |
+            You are working in a Next.js app under /web.
+            Rules:
+            - Only modify files under /web (do not change CI/workflows).
+            - Do not add or print secrets.
+            - Keep changes minimal and consistent with existing code style.
+            - After changes, ensure: npm run lint && npm run build succeed.
+
+            Task:
+            ${{ inputs.task }}
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: ${{ inputs.branch }}
+          title: "AI Task: ${{ inputs.task }}"
+          commit-message: "AI: implement task"
+          body: |
+            ## Task
+            ${{ inputs.task }}
+
+            ## Notes
+            - Changes are limited to /web
+            - CI (lint+build) executed in workflow
