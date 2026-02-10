@@ -81,13 +81,12 @@ jobs:
           script: |
             const issue_number = context.payload.issue.number;
             const prUrl = `${{ steps.cpr.outputs.pull-request-url }}`;
+            const body = `PR created: ${prUrl}\n\nCI gecince **auto-merge** ile main'e alinacak ve Vercel prod deploy edecektir.`;
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number,
-              body: `? PR created: ${prUrl}
-
-CI ge?ince **auto-merge** ile main'e al?nacak ve Vercel prod deploy edecektir.`
+              body
             });
 
       - name: Enable auto-merge on the PR
