@@ -59,6 +59,7 @@ jobs:
         id: cpr
         uses: peter-evans/create-pull-request@v6
         with:
+          token: ${{ secrets.GH_PAT || secrets.GH_PATH }}
           branch: ai/issue-${{ github.event.issue.number }}
           title: "AI: ${{ github.event.issue.title }}"
           commit-message: "AI: implement issue #${{ github.event.issue.number }}"
@@ -92,7 +93,7 @@ jobs:
       - name: Enable auto-merge on the PR
         if: steps.cpr.outputs.pull-request-number != ''
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_PAT || secrets.GH_PATH }}
         run: |
           PR_NUMBER="${{ steps.cpr.outputs.pull-request-number }}"
           gh pr merge "$PR_NUMBER" --auto --squash --delete-branch
