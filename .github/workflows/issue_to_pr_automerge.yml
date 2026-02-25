@@ -9,6 +9,9 @@ permissions:
   pull-requests: write
   issues: write
 
+env:
+  CODEX_VERSION: "0.105.0"
+
 jobs:
   ai_from_issue:
     # Sadece ai-task label'? varsa ?al??s?n (issue template otomatik ekliyor)
@@ -30,10 +33,19 @@ jobs:
         working-directory: web
         run: npm ci
 
+      - name: Normalize npm registry for Codex
+        run: |
+          npm config set registry https://registry.npmjs.org/
+          npm config delete @openai:registry || true
+
       - name: Run Codex to implement task
         uses: openai/codex-action@v1
+        env:
+          NODE_AUTH_TOKEN: ""
         with:
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          codex-version: ${{ env.CODEX_VERSION }}
+          working-directory: web
           prompt: |
             You are working in a Next.js app under /web.
             HARD RULES:
@@ -59,7 +71,7 @@ jobs:
         id: cpr
         uses: peter-evans/create-pull-request@v6
         with:
-          token: ${{ secrets.GH_PAT || secrets.GH_PATH }}
+          token: ${{ secrets.GH_PAT || github.token }}
           branch: ai/issue-${{ github.event.issue.number }}
           title: "AI: ${{ github.event.issue.title }}"
           commit-message: "AI: implement issue #${{ github.event.issue.number }}"
@@ -93,7 +105,7 @@ jobs:
       - name: Enable auto-merge on the PR
         if: steps.cpr.outputs.pull-request-number != ''
         env:
-          GH_TOKEN: ${{ secrets.GH_PAT || secrets.GH_PATH }}
+          GH_TOKEN: ${{ secrets.GH_PAT || github.token }}
         run: |
           PR_NUMBER="${{ steps.cpr.outputs.pull-request-number }}"
           gh pr merge "$PR_NUMBER" --auto --squash --delete-branch

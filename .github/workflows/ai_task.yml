@@ -16,6 +16,9 @@ permissions:
   contents: write
   pull-requests: write
 
+env:
+  CODEX_VERSION: "0.105.0"
+
 jobs:
   ai_task:
     runs-on: ubuntu-latest
@@ -36,11 +39,20 @@ jobs:
       - name: Install deps
         run: npm ci
 
+      - name: Normalize npm registry for Codex
+        run: |
+          npm config set registry https://registry.npmjs.org/
+          npm config delete @openai:registry || true
+
       # Codex runs and edits files in the repo based on the task
       - name: Run Codex to implement task
         uses: openai/codex-action@v1
+        env:
+          NODE_AUTH_TOKEN: ""
         with:
-          openai_api_key: ${{ secrets.OPENAI_API_KEY }}
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          codex-version: ${{ env.CODEX_VERSION }}
+          working-directory: web
           # Give Codex clear constraints to reduce risk
           prompt: |
             You are working in a Next.js app under /web.
