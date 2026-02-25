@@ -10,7 +10,7 @@ permissions:
   issues: write
 
 env:
-  CODEX_VERSION: "0.105.0"
+  CODEX_VERSION: "0.103.0"
 
 jobs:
   ai_from_issue:
@@ -40,12 +40,9 @@ jobs:
 
       - name: Run Codex to implement task
         uses: openai/codex-action@v1
-        env:
-          NODE_AUTH_TOKEN: ""
         with:
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
           codex-version: ${{ env.CODEX_VERSION }}
-          working-directory: web
           prompt: |
             You are working in a Next.js app under /web.
             HARD RULES:
